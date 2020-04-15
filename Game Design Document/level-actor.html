@@ -1,0 +1,173 @@
+<html>
+  <head>
+    <!----Aframe Plugins---->
+    <script src="https://cdn.jsdelivr.net/npm/aframe-scene@1.0.3/dist/aframe-master.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/aframe-camera-cube-env@1.1.0/camera-cube-env.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/aframe-touch-look-controls@1.1.0/touch-look-controls.js"></script>
+
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/aframe-mouse-rotate@1.1.0/mouse-rotate.js"></script>
+
+    <script src="https://rawgit.com/feiss/aframe-environment-component/master/dist/aframe-environment-component.min.js"></script>
+
+    <!----Verse Gameplay Scripts---->
+    <script>
+      AFRAME.registerComponent('no-occlusion', {
+        init: function () {
+            this.el.addEventListener("model-loaded", (e)=>{
+            var obj = this.el.getObject3D('mesh');
+            obj.traverse( function( object ) {
+
+                object.frustumCulled = false;
+
+            } );
+          })
+        }
+      });
+    </script>
+
+    <script>
+      AFRAME.registerComponent('controller', {
+        init: function () {
+          var isMobile = /Android|webOS|iPad|iPhone|iPod/.test(navigator.platform)|| (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+          
+          if(isMobile){
+            const controls = document.getElementById('Camera');
+            controls.setAttribute('touch-look-controls', {
+              enabled: true,
+            });
+          }
+          else{
+            const controls = document.getElementById('Camera');
+            controls.setAttribute('touch-look-controls', {
+              enabled: false,
+            });
+          }
+
+        }
+      });
+    </script>
+  </head>
+
+  
+  <!----Verse Game Scene---->
+  <body>
+      <a-scene 
+        renderer="antialias: true; logarithmicDepthBuffer; true;"
+        physics="gravity:0;"
+        vr-mode-ui="enabled: false"
+        loading-screen="enabled: false">
+
+        <a-assets>
+          <a-asset-item 
+            id="level1" 
+            src="https://firebasestorage.googleapis.com/v0/b/timbre-d11e2.appspot.com/o/assets%2F5bdf05c2-e289-4fd9-a199-2592cfd227df.glb?alt=media&token=b3b70d11-7d58-4dd3-a345-4f7d0a364572">
+          </a-asset-item>
+        </a-assets>
+
+        <!----3D Skybox---->
+        <a-sky 
+          id="Skybox"
+          src="" 
+          material=" 
+            side: back; 
+            shader: skyshader; 
+            sunPosition: 17 30 27;">
+        </a-sky>
+        
+        <!----Camera Controls---->
+        <a-entity 
+          id="Player" 
+          position="-1.3 0 37"
+          movement-controls="speed:0.35; fly:false; constrainToNavMesh: true;"
+          >
+            <a-entity 
+              id="Camera"
+              camera 
+              controller
+              position="0 1.3 3" 
+              mouse-rotate="rspeed:-3.00"
+              cursor="rayOrgin:mouse; fuse:false;"
+              touch-look-controls="enabled: true;"">
+                            
+                  <a-entity 
+                    id="Weapon" 
+                    shadow
+                    camera-cube-env="resolution:20;"
+                    animation-mixer="clip:PlayerIdle;"
+                    scale=".03 .03 .03" 
+                    rotation="-90 0 0" 
+                    position="0 0 0" 
+                    gltf-model="https://firebasestorage.googleapis.com/v0/b/timbre-d11e2.appspot.com/o/assets%2F43d1c91f-c1c2-4316-8613-77dd6939df97.glb?alt=media&token=a2f0dc52-a3b5-4fcf-ab65-daae1c57e9c0">
+                  </a-entity>
+                  <a-cursor fuse="false">
+                  </a-cursor>
+            </a-entity>
+        </a-entity>
+
+        <!--Game World Navigation-->     
+        <a-entity 
+          id="NavMesh" 
+          nav-mesh
+          visible="true" 
+          scale="5 5 5" 
+          rotation="0 0 0" 
+          position="0 -.8 4" 
+          gltf-model="">
+        </a-entity>
+
+        
+        <a-entity 
+          id="House" 
+          camera-cube-env="resolution:20;"
+          static-body="shape: box;"
+          scale="1 1 1" 
+          rotation="0 0 0" 
+          position="0 0 4" 
+          gltf-model="#level1">
+        </a-entity>
+
+        <a-entity 
+          id="L2" 
+          camera-cube-env="resolution:20;"
+          static-body="shape: box;"
+          scale="1 1 1" 
+          rotation="0 0 0" 
+          position="0 0 4" 
+          gltf-model="https://firebasestorage.googleapis.com/v0/b/timbre-d11e2.appspot.com/o/assets%2F21feb0ed-41c1-47ee-929d-877e8708a2c1.glb?alt=media&token=85be35ac-3f4c-467e-910b-c95814c9824e">
+        </a-entity>
+        
+        <a-entity 
+          id="L3" 
+          camera-cube-env="resolution:20;"
+          static-body="shape: box;"
+          scale="1 1 1" 
+          rotation="0 0 0" 
+          position="0 0 4" 
+          gltf-model="https://firebasestorage.googleapis.com/v0/b/timbre-d11e2.appspot.com/o/assets%2F29fd432d-f3af-4e99-8846-b0dd00c50fc1.glb?alt=media&token=5f484269-2e61-49d3-ab87-ae83c297d8b4">
+        </a-entity>
+
+        <!--Game Enemy -->
+        <a-entity 
+          id="Enemy" 
+          animation-mixer="clip:Combo1;"
+          no-occlusion
+          scale="1.3 1.3 1.3" 
+          rotation="0 0 0" 
+          position="0 -.3 4" 
+          gltf-model="https://firebasestorage.googleapis.com/v0/b/timbre-d11e2.appspot.com/o/assets%2F03300663-ad72-44e9-85db-ee76b422401f.glb?alt=media&token=e6df6a67-501f-4500-a40b-9cf5bb37fdd6">
+        </a-entity>
+
+        <!-- Default lighting injected by A-Frame. -->
+        <a-entity id="Ambient" light="type: ambient; color: #FFF; intensity: 0.5" position="5 4 3"></a-entity>
+        <a-entity  id="Point" light="type: point; color: #FFF; intensity: 0.4" position="1 3 -8"></a-entity>
+        <a-entity id="Direction" light="type: directional; color: #FFF; intensity: 0.7; " position="-0.5 1 1"></a-entity>
+        
+      </a-scene>
+  </body>
+</html>
